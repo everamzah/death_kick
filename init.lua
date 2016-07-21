@@ -1,32 +1,34 @@
-local die = {}
+local death_kick = {}
 
 minetest.register_on_joinplayer(function(player)
-	die[player:get_player_name()] = 0
+	death_kick[player:get_player_name()] = 0
 end)
 
 minetest.register_on_leaveplayer(function(player)
-	die[player:get_player_name()] = nil
+	death_kick[player:get_player_name()] = nil
 end)
 
 minetest.register_on_dieplayer(function(player)
-	local name = player:get_player_name()
-	if not die[name] then
-		die[name] = 0
-	end
-	die[name] = die[name] + 1
-	if die[name] == 5 then
-		minetest.kick_player(name, "You died.")
-	end
 	minetest.after(10, function()
-		if not player then
-			return
+		if (not player) or player:get_hp() ~= 0 then
+			return false
+		else
+			player:set_hp(player:get_hp() - 1)
 		end
-		if player:get_hp() == 0 then
-			player:set_hp(player:get_hp() - 20)
+
+		local name = player:get_player_name()
+		if not death_kick[name] then
+			death_kick[name] = 1
+		else
+			death_kick[name] = death_kick[name] + 1
+		end
+
+		if death_kick[name] == 5 then
+			minetest.kick_player(name, "You died.")
 		end
 	end, player)
 end)
 
 minetest.register_on_respawnplayer(function(player)
-	die[player:get_player_name()] = 0
+	death_kick[player:get_player_name()] = 0
 end)
