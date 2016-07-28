@@ -1,2 +1,2 @@
 # death_kick
-WTFPL
+LGPL v2.1+
